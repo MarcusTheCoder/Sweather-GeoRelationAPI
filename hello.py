@@ -59,11 +59,14 @@ def sweather():
         nReq = int(data["numToFind"])
       divisions = GDAL_Stuff.TIFF_DIV
       if "threshDiv" in data.keys():
-        threshDiv = int(data["threshDiv"])
+        divisions = int(data["threshDiv"])
 
-      listGood = GDAL_Stuff.sweather_main(float(data["long"]),float(data["lat"]),anticipWater=antiR,minR=minRad,maxR=maxRad,nToSolve=nReq,threshDiv=threshDiv)
+      [listGood,ucHeight] = GDAL_Stuff.sweather_main(float(data["long"]),float(data["lat"]),anticipWater=antiR,minR=minRad,maxR=maxRad,nToSolve=nReq,threshDiv=divisions)
+      
       print(listGood)
-  return jsonify(listGood)
+  return jsonify([listGood,ucHeight])
+
+  
   
 
 @app.route('/')

@@ -156,7 +156,20 @@ def findSafePolys(x,y,polyFp,anticipatedWaterLevel,rasterGrad,minRadius=MIN_RADI
 
 
 def createTiffFromCoord(long,lat,expanse=[MAX_RADIUS,MAX_RADIUS],res=3):
-  
+  pass
+def calculateRisk(anticipWater,myElev):
+  if myElev <= anticipWater:
+    return 5
+  elif myElev - 1 <= anticipWater:
+    return 4
+  elif myElev - 2 <= anticipWater:
+    return 3
+  elif myElev - 4 <= anticipWater:
+    return 2
+  elif myElev - 8 <= anticipWater:
+    return 1
+  else :
+    return 0
 
 def sweather_main(long,lat,minR=MIN_RADIUS,maxR=MAX_RADIUS,nToSolve=1,anticipWater=20,threshDiv=TIFF_DIV):
   '''
@@ -169,8 +182,8 @@ def sweather_main(long,lat,minR=MIN_RADIUS,maxR=MAX_RADIUS,nToSolve=1,anticipWat
   step = polyganizeRaster(filepath,divv=threshDiv)  
   processRaster(OUTTIFF,step,OUTPOLY,True)
 
-  x = -73.756233 # Longitude
-  y = 42.652580 # Latitude
+  x = long # Longitude
+  y = lat # Latitude
   oRef = osr.SpatialReference()
   oRef.ImportFromEPSG(4326)
   targRef = osr.SpatialReference()
@@ -193,8 +206,10 @@ def sweather_main(long,lat,minR=MIN_RADIUS,maxR=MAX_RADIUS,nToSolve=1,anticipWat
     y = ele[1].GetY()
     distAway = math.sqrt((math.pow(x,2)-math.pow(longi,2))/(math.pow(y,2)-math.pow(lati,2)))
     [longi2,lati2,z] = revTran.TransformPoint(x,y)
-    goodPoints.append([(longi,lati),ele[2],distAway])
+    
+    goodPoints.append([[longi2,lati2],ele[2],distAway,calculateRisk(anticipWater,ele[2])])
   goodPoints.sort(key=lambda ls: ls[1]/ls[2],reverse=True)
+
   return [goodPoints,ucHeight]
 
 
